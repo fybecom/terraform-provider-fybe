@@ -1,0 +1,69 @@
+terraform {
+  required_providers {
+    fybe = {
+      source = "fybe/fybe"
+      version = "1.0.0"
+    }
+  }
+}
+
+provider "fybe" {
+    oauth2_client_id              = "XXX"
+    oauth2_client_secret          = "XXX"
+    oauth2_user                   = "XXX"
+    oauth2_pass                   = "XXX"
+}
+
+resource "fybe_secret" "master_password" {
+  name = "Master Password"
+  value = "Test1234!"
+  type = "password"
+}
+
+resource "fybe_instance" "prod_k8s_cp" {
+        display_name              = "prod-k8s-control-plane"
+        product_id                = "V17"
+        image_id                  = "c5726076-3a16-420c-9c8f-b239c54379d0"
+        region                    = "us-east-1"
+        root_password              = fybe_secret.master_password.id
+}
+
+resource "fybe_instance" "prod_k8_worker" {
+        display_name              = "prod-k8s-worker"
+        product_id                = "V17"
+        image_id                  = "c5726076-3a16-420c-9c8f-b239c54379d0"
+        region                    = "us-east-1"
+        root_password              = fybe_secret.master_password.id
+}
+
+resource "fybe_instance" "prod_k8s_lb" {
+        display_name              = "prod-k8s-loadbalancer"
+        product_id                = "V3"
+        image_id                  = "c5726076-3a16-420c-9c8f-b239c54379d0"
+        region                    = "us-east-1"
+        root_password              = fybe_secret.master_password.id
+}
+
+resource "fybe_vpc" "prod_k8s_cluster" {
+  name        = "prod_k8s_cluster"
+  description = "Contains all compute instances for our prod k8s cluster"
+  region         = "us-east-1"
+  instance_ids = [fybe_instance.prod_k8s_cp.id, fybe_instance.prod_k8_worker.id, fybe_instance.prod_k8s_lb.id]
+}
+
+
+resource "fybe_object_storage" "main_object_storage" {
+        region                    = "us-central-1"
+        total_purchased_space_tb  = "1"
+}
+
+resource "fybe_object_storage_bucket" "backup_bucket" {
+        name                    = "backups"
+        object_storage_id       = fybe_object_storage.main_object_storage.id
+}
+
+resource "fybe_object_storage_bucket" "public_bucket" {
+        name                    = "public"
+        object_storage_id       = fybe_object_storage.main_object_storage.id
+        public_sharing          = true
+}

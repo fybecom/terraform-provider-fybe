@@ -1,0 +1,65 @@
+project_name: terraform-provider-fybe
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+builds:
+- env:
+    - CGO_ENABLED=0
+  mod_timestamp: '{{ .CommitTimestamp }}'
+  flags:
+    - -trimpath
+  ldflags:
+      - -w -s -X fybe.com/terraform-provider-fybe/cmd.version={{.Tag}} -X fybe.com/terraform-provider-fybe/cmd.commit={{.Commit}} -X fybe.com/terraform-provider-fybe/cmd.date={{.Date}}
+  goos:
+    - linux
+    - freebsd
+    - darwin
+    - windows
+  goarch:
+    - amd64
+    - arm64
+    - arm
+    - '386'
+  ignore:
+    - goos: darwin
+      goarch: '386'
+  binary: '{{ .ProjectName }}_v{{ .Version }}'
+archives:
+  - name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    format: zip
+    files:
+      - README.md
+      - LICENSE
+checksum:
+  extra_files:
+    - glob: 'terraform-registry-manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
+signs:
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+changelog:
+  skip: true
+release:
+  github:
+    owner: fybecom
+    name: terraform-provider-fybe
+  extra_files:
+    - glob: 'terraform-registry-manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+  draft: false
+  prerelease: auto
+  header: |
+    Fybe
+  footer: |
+    Cloud services international LLC
+
