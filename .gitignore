@@ -5,4 +5,5 @@ examples/terraform.tfstate.backup
 examples/.terraform
 main.tf
 terraform-provider-fybe_v1.0.0
+tfplugindocs
 
