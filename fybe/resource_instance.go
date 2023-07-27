@@ -220,7 +220,6 @@ func resourceInstance() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Default:     1,
 				Description: "",
 			},
 			"additional_ips": {
