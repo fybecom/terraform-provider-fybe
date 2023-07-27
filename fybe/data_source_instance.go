@@ -209,7 +209,6 @@ func dataSourceInstance() *schema.Resource {
 			"period": {
 				Type:        schema.TypeInt,
 				Computed:    true,
-				Default:     1,
 				Description: "",
 			},
 			"additional_ips_v4": {
