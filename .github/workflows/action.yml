@@ -17,6 +17,7 @@ on:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    permissions: write-all
     env:
       OPENAPIURL: "https://api.fybe.com/api-v1.yaml"
     steps:
