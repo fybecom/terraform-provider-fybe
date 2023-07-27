@@ -46,3 +46,9 @@ terraform plan
 # CAUTION:  with example main.tf you are about to buy and pay an compute instance
 terraform apply
 ```
+
+## Generate documentation
+
+To generate documentation you need to have [tfplugindocs](https://github.com/hashicorp/terraform-plugin-docs) installed.  
+Then you can generate the documentation with this command `tfplugindocs generate`.  
+
